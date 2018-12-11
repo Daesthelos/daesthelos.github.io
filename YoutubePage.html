@@ -1,0 +1,89 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<style>
+		body {
+		background:black;
+		color:white;
+	}
+	</style>
+	<script type="text/javascript" src="https://www.youtube.com/iframe_api"></script>
+	<script src="script/framework.js"></script>
+</head>
+<body>
+	<ul id="liSongList"></ul>
+
+<div id="port"></div>
+
+<script type="text/javascript">
+	function onYouTubeIframeAPIReady(){ init(); } //Necessary because youtube is pretty specific about making the api call this particularly named function.
+
+	var view = {
+		songList: document.querySelector("#liSongList"),
+		player : document.querySelector("#port"),
+	};
+
+	function Song(title,id){
+		if(!(this instanceof Song)){ throw new Error("song is a constructor and must be called with the new keyword.")}
+		this.title = title;
+		this.id = id;
+	}
+
+	function init(){
+		var songList = [new Song("Bios - Guilty Crown","UMCka_vXtL4"),
+
+						];
+		setupView(songList);
+
+		//Constructor prevents me from setting events from view model. Initial video id needs to be loaded here because for some reason it doesnt finish initializing for a short bit.
+		viewModel.setPlayer(
+			new YT.Player('port',{
+				height : "300",
+				width  : "300",
+				videoId : songList[0].id,
+				events : {
+					onReady : viewModel.playerEvents.ready,
+					onStateChange : viewModel.playerEvents.stateChanged,
+				},
+			})
+		);
+	}
+
+	function setupView(songList){
+		songList.forEach(song=>{
+			var el = document.createElement("li");
+			el.innerHTML = song.title;
+			el.dataset.id = song.id;
+			el.onclick = viewModel.events.videoSelected;
+
+			view.songList.appendChild(el);
+		});
+	}
+
+	var viewModel = (function(){
+		var _player = 4;
+
+		var playerEvents = {
+			ready(){},
+			stateChanged(){},
+		};
+
+		var _ = {
+			setPlayer(ytPlayer){
+				_player = ytPlayer;
+			},
+			getPlayer(){ return _player; },
+			loadVideo(id){ _player.loadVideoById({videoId:id}) },
+			events : {
+				videoSelected(){
+					var id = this.dataset.id;
+					_player.loadVideoById({videoId:id});
+				},
+			},
+			playerEvents: playerEvents,
+		};
+		return _;
+	})();
+</script>
+</body>
+</html>
