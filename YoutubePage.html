@@ -2,16 +2,34 @@
 <html>
 <head>
 	<style>
-		body {
+	html, body { 
+   		 margin:0; 
+   		 padding:0; 
+   		 height:100%; 
+	}
+	body {
 		background:black;
 		color:white;
+	}
+	#ulSongList { 
+		padding:3px; 
+		margin:0;
+		height:100%;
+		float:left;
+	}
+	#ulSongList > li {
+		margin:2px;
+		list-style: none;
+		border-radius:5px;
+		
+		border: solid 1px white;
 	}
 	</style>
 	<script type="text/javascript" src="https://www.youtube.com/iframe_api"></script>
 	<script src="script/framework.js"></script>
 </head>
 <body>
-	<ul id="liSongList"></ul>
+	<ul id="ulSongList"></ul>
 
 <div id="port"></div>
 
@@ -19,7 +37,7 @@
 	function onYouTubeIframeAPIReady(){ init(); } //Necessary because youtube is pretty specific about making the api call this particularly named function.
 
 	var view = {
-		songList: document.querySelector("#liSongList"),
+		songList: document.querySelector("#ulSongList"),
 		player : document.querySelector("#port"),
 	};
 
