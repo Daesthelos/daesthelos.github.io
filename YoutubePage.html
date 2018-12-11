@@ -32,7 +32,7 @@
 <body>
 <ul id="ulSongList"></ul>
 <div id="port"></div>
-<p>Now playing: Bios - Guilty Crown</p>
+<p id="status">Now playing: Bios - Guilty Crown</p>
 
 <script type="text/javascript">
 	function onYouTubeIframeAPIReady(){ init(); } //Necessary because youtube is pretty specific about making the api call this particularly named function.
@@ -40,6 +40,10 @@
 	var view = {
 		songList: document.querySelector("#ulSongList"),
 		player : document.querySelector("#port"),
+		status: document.querySelector("#status"),
+		setStatus(state,message){
+			this.status.innerText = `${state}: ${message}`;
+		},
 	};
 
 	function Song(title,id){
@@ -48,8 +52,8 @@
 		this.id = id;
 	}
 
-	function init(){
-		var songList = [new Song("Bios - Guilty Crown","UMCka_vXtL4"),
+	//Feels kinda dirty making this global but this needs to be referenced in various different scopes
+	var songList = [	new Song("Bios - Guilty Crown","UMCka_vXtL4"),
 						new Song("Unravel - Tokyo Ghoul","QKXi08chD2E"),
 						new Song("God Knows... - The Melancholy of Haruhi Suzumiya","WWB01IuMvzA"),
 						new Song("Let Me Hear - Parasyte","yWlUCpXyh9w"),
@@ -57,8 +61,10 @@
 						new Song("Voracity - MYTH & ROID","D-LXfVLL5Tc"),
 						new Song("Blue Exorcist OP 2","H5wtqQPEpt8"),
 						new Song("Psycho Pass OP 3","fmKPfgsclHg"),
-						];
-		setupView(songList);
+	];
+
+	function init(){	
+		setupView();
 
 		//Constructor prevents me from setting events from view model. Initial video id needs to be loaded here because for some reason it doesnt finish initializing for a short bit.
 		viewModel.setPlayer(
@@ -74,7 +80,7 @@
 		);
 	}
 
-	function setupView(songList){
+	function setupView(){
 		songList.forEach(song=>{
 			var el = document.createElement("li");
 			el.innerHTML = song.title;
@@ -86,23 +92,30 @@
 	}
 
 	var viewModel = (function(){
-		var _player = 4;
+		var _model = new Observable({
+			songID : null,
+			currentSong : null,
+		});
+		var _player;
 
 		var playerEvents = {
 			ready(){},
 			stateChanged(){ },//Don't autoplay. Not 100% sure how to implement yet
 		};
 
+		_model.subscribe("change/songID",function(id){ loadVideo(id.new); _model.currentSong = songList.find(song => song.id == id.new);  });
+		_model.subscribe("change/currentSong", function(song){ view.setStatus("Now Playing", song.new.title); });
+
+		function loadVideo(id){ _player.loadVideoById({videoId:id}); }
+
 		var _ = {
 			setPlayer(ytPlayer){
 				_player = ytPlayer;
 			},
 			getPlayer(){ return _player; },
-			loadVideo(id){ _player.loadVideoById({videoId:id}) },
 			events : {
 				videoSelected(){
-					var id = this.dataset.id;
-					_player.loadVideoById({videoId:id});
+					_model.songID = this.dataset.id;
 				},
 			},
 			playerEvents: playerEvents,
