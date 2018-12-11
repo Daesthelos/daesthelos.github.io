@@ -19,6 +19,7 @@
 	}
 	#ulSongList > li {
 		margin:2px;
+		padding:1px;
 		list-style: none;
 		border-radius:5px;
 		
@@ -29,9 +30,9 @@
 	<script src="script/framework.js"></script>
 </head>
 <body>
-	<ul id="ulSongList"></ul>
-
+<ul id="ulSongList"></ul>
 <div id="port"></div>
+<p>Now playing: Bios - Guilty Crown</p>
 
 <script type="text/javascript">
 	function onYouTubeIframeAPIReady(){ init(); } //Necessary because youtube is pretty specific about making the api call this particularly named function.
@@ -50,6 +51,12 @@
 	function init(){
 		var songList = [new Song("Bios - Guilty Crown","UMCka_vXtL4"),
 						new Song("Unravel - Tokyo Ghoul","QKXi08chD2E"),
+						new Song("God Knows... - The Melancholy of Haruhi Suzumiya","WWB01IuMvzA"),
+						new Song("Let Me Hear - Parasyte","yWlUCpXyh9w"),
+						new Song("Silent Solitude - OxT","_4IlQEK1Vug"),
+						new Song("Voracity - MYTH & ROID","D-LXfVLL5Tc"),
+						new Song("Blue Exorcist OP 2","H5wtqQPEpt8"),
+						new Song("Psycho Pass OP 3","fmKPfgsclHg"),
 						];
 		setupView(songList);
 
@@ -83,7 +90,7 @@
 
 		var playerEvents = {
 			ready(){},
-			stateChanged(){},
+			stateChanged(){ },//Don't autoplay. Not 100% sure how to implement yet
 		};
 
 		var _ = {
