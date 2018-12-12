@@ -12,11 +12,20 @@
 		background:black;
 		color:white;
 	}
+	.containerLeft {
+		width:12.5%;
+		height:100%;
+		float:left;
+	}
+	.containerRight {
+		width:87.5%;
+		height:100%;
+	}
 	#ulSongList { 
 		padding:3px; 
 		margin:0;
 		height:100%;
-		float:left;
+		width:100%;
 	}
 	#ulSongList > li {
 		margin:2px;
@@ -31,10 +40,15 @@
 	<script src="script/framework.js"></script>
 </head>
 <body>
-<ul id="ulSongList"></ul>
-<div id="port"></div>
-<p id="status">Now playing: Bios - Guilty Crown</p>
-
+	<div class="containerLeft">
+		<ul id="ulSongList"></ul>
+	</div>
+	<div class="containerRight">
+		<div>
+			<div id="port"></div>
+			<p id="status">Now playing: Bios - Guilty Crown</p>
+		</div>
+	</div>
 <script type="text/javascript">
 	function onYouTubeIframeAPIReady(){ init(); } //Necessary because youtube is pretty specific about making the api call this particularly named function.
 
@@ -54,14 +68,20 @@
 	}
 
 	//Feels kinda dirty making this global but this needs to be referenced in various different scopes
-	var songList = [	new Song("Bios - Guilty Crown","UMCka_vXtL4"),
-						new Song("Unravel - Tokyo Ghoul","QKXi08chD2E"),
+	var songList = [	new Song("Unravel - Tokyo Ghoul","QKXi08chD2E"),
 						new Song("God Knows... - The Melancholy of Haruhi Suzumiya","WWB01IuMvzA"),
 						new Song("Let Me Hear - Parasyte","yWlUCpXyh9w"),
 						new Song("Silent Solitude - OxT","_4IlQEK1Vug"),
 						new Song("Voracity - MYTH & ROID","D-LXfVLL5Tc"),
 						new Song("Blue Exorcist OP 2","H5wtqQPEpt8"),
 						new Song("Psycho Pass OP 3","fmKPfgsclHg"),
+						new Song("We Will Rock You - Monster Strike","l8YXfBP3VFM"),
+						new Song("Daze - Mekakucity Actors","jgv-IFmIn8c"),
+						new Song("A Tale of 6 Trillion Nights - IA","EAgk-t2zzqw"),
+						new Song("Pantomime - IA","JAXukKb0fgU"),
+						new Song("Soul Eater OP 1","UAzpX8-P4WE"),
+						new Song("Silly-Go-Round - FictionJunction","GzGWvvYOqK4"),
+
 	];
 
 	function init(){	
@@ -70,8 +90,8 @@
 		//Constructor prevents me from setting events from view model. Initial video id needs to be loaded here because for some reason it doesnt finish initializing for a short bit.
 		viewModel.setPlayer(
 			new YT.Player('port',{
-				height : "300",
-				width  : "300",
+				height : "450",
+				width  : "800",
 				videoId : songList[0].id,
 				events : {
 					onReady : viewModel.playerEvents.ready,
@@ -94,17 +114,45 @@
 
 	var viewModel = (function(){
 		var _model = new Observable({
+			idx : -1,
 			songID : null,
 			currentSong : null,
 		});
+		var autoplay = true;
+
 		var _player;
+		var _playerState = {
+			UNSTARTED : -1,
+			ENDED : 0,
+			PLAYING : 1,
+			PAUSED : 2,
+			BUFFERING : 3,
+			CUED : 5,
+		};
 
 		var playerEvents = {
 			ready(){},
-			stateChanged(){ },//Don't autoplay. Not 100% sure how to implement yet
+			stateChanged(eventData){ 
+				//Wish they would rename this to PLAYER_STATE or something because that's what it really is
+				if(eventData.data == _playerState.ENDED){
+					if(_model.idx > -1 && autoplay){
+						if(_model.idx == songList.length -1){
+							_model.idx = 0;
+							_model.songID = songList[_model.idx].id;
+						} else if(_model.idx <= songList.length -2) {
+							_model.idx++;
+							_model.songID = songList[_model.idx].id;
+						}
+					}
+				}
+			 },
 		};
 
-		_model.subscribe("change/songID",function(id){ loadVideo(id.new); _model.currentSong = songList.find(song => song.id == id.new);  });
+		_model.subscribe("change/songID",function(id){ 
+			loadVideo(id.new); 
+			_model.currentSong = songList.find(song => song.id == id.new); 
+			_model.idx = songList.map(x=> x.id).indexOf(id.new);
+	    });
 		_model.subscribe("change/currentSong", function(song){ view.setStatus("Now Playing", song.new.title); });
 
 		function loadVideo(id){ _player.loadVideoById({videoId:id}); }
