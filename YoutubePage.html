@@ -38,6 +38,10 @@
 		overflow:hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;
+		-webkit-transition: all 0.4s ease-in;
+    	-moz-transition: all 0.4s ease-in;
+    	-o-transition: all 0.4s ease-in;
+    	transition: all 0.4s ease-in;
 	}
 	.player-control {
 		cursor: pointer;
@@ -45,6 +49,10 @@
 
 	.isNotVisible {
 		visibility: hidden;
+	}
+	.activated {
+		background-color:white;
+		color:black;
 	}
 	</style>
 	<script type="text/javascript" src="https://www.youtube.com/iframe_api"></script>
@@ -180,6 +188,14 @@
 			}
 		}
 
+		function toggleClass(domElement,className){
+			if(domElement.classList.contains(className)){
+				domElement.classList.remove(className);
+			} else {
+				domElement.classList.add(className);
+			}
+		}
+
 		var playerEvents = {
 			ready(){},
 			stateChanged(eventData){ 
@@ -198,7 +214,15 @@
 			_model.currentSong = songList.find(song => song.id == id.new); 
 			_model.idx = songList.map(x=> x.id).indexOf(id.new);
 	    });
-		_model.subscribe("change/currentSong", function(song){ view.setStatus("Now Playing", song.new.title); });
+		_model.subscribe("change/currentSong", function(song){ 
+			view.setStatus("Now Playing", song.new.title); 
+
+			var currentSongLi = document.querySelector("#ulSongList li.activated");
+			if(currentSongLi != null){
+				currentSongLi.classList.remove("activated");
+			}		
+			document.querySelector(`#ulSongList li[data-id="${_model.songID}"]`).classList.add("activated");
+		});
 
 		function loadVideo(id){ _player.loadVideoById({videoId:id}); }
 
