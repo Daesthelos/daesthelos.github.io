@@ -32,8 +32,11 @@
 		padding:1px;
 		list-style: none;
 		border-radius:5px;
-		
+		cursor:pointer;
 		border: solid 1px white;
+		overflow:hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
 	}
 	.player-control {
 		cursor: pointer;
@@ -116,6 +119,7 @@
 		songList.forEach(song=>{
 			var el = document.createElement("li");
 			el.innerHTML = song.title;
+			el.title = song.title;
 			el.dataset.id = song.id;
 			el.onclick = viewModel.events.videoSelected;
 
