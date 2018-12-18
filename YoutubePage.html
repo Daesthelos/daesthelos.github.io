@@ -26,6 +26,7 @@
 		margin:0;
 		height:100%;
 		width:100%;
+		overflow-y: scroll;
 	}
 	#ulSongList > li {
 		margin:2px;
@@ -40,6 +41,10 @@
 	}
 	.player-control {
 		cursor: pointer;
+	}
+
+	.isNotVisible {
+		visibility: hidden;
 	}
 	</style>
 	<script type="text/javascript" src="https://www.youtube.com/iframe_api"></script>
@@ -56,6 +61,7 @@
 				<span class="player-control" data-prop="prev" style="color:red"><-</span>
 				<span class="player-control" data-prop="togglePlay" style="color:yellow">-</span>
 				<span class="player-control" data-prop="next" style="color:green">-></span>
+				<span><label>Hide:<input data-prop="displayPort" type="checkbox" /></label></span>
 			</p>
 			<p id="status">Now playing: Bios - Guilty Crown</p>
 		</div>
@@ -67,6 +73,7 @@
 		songList: document.querySelector("#ulSongList"),
 		player : document.querySelector("#port"),
 		status: document.querySelector("#status"),
+		displayPort : document.querySelector("[data-prop='displayPort']"),
 		setStatus(state,message){
 			this.status.innerText = `${state}: ${message}`;
 		},
@@ -95,7 +102,7 @@
 						new Song("Mob Psycho OP","l5rPZJiYFfg"),
 						new Song("Fallen - EGOIST", "0lSLpbAxBTA"),
 						new Song("Genesis - Stereo Dive Foundation", "hMKDN6B6fQA"),
-
+						
 	];
 
 	function init(){	
@@ -125,6 +132,7 @@
 
 			view.songList.appendChild(el);
 		});
+		view.port = document.getElementById("port");
 	}
 
 	var viewModel = (function(){
@@ -147,6 +155,15 @@
 
 		document.querySelector("[data-prop='prev']").onclick = prevSong;
 		document.querySelector("[data-prop='next']").onclick = nextSong;
+		view.displayPort.onclick = function(){ 
+			var isDisplayed = this.checked,
+			    port = document.getElementById("port"); //Would rather not do this but binding timings are weird so sometimes it still references the original div
+			if(isDisplayed){
+				port.classList.add("isNotVisible");
+			} else {
+				port.classList.remove("isNotVisible");
+			}
+		 }
 
 		function nextSong(){
 			if(_model.idx == songList.length -1){
@@ -175,7 +192,7 @@
 			 },
 		};
 
-		_model.subscribe("change/idx", function(idx){ console.log(_model.songID = songList[idx.new].id); });
+		_model.subscribe("change/idx", function(idx){ _model.songID = songList[idx.new].id; });
 		_model.subscribe("change/songID",function(id){ 
 			loadVideo(id.new); 
 			_model.currentSong = songList.find(song => song.id == id.new); 
