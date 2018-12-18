@@ -35,6 +35,9 @@
 		
 		border: solid 1px white;
 	}
+	.player-control {
+		cursor: pointer;
+	}
 	</style>
 	<script type="text/javascript" src="https://www.youtube.com/iframe_api"></script>
 	<script src="script/framework.js"></script>
@@ -46,6 +49,11 @@
 	<div class="containerRight">
 		<div>
 			<div id="port"></div>
+			<p>
+				<span class="player-control" data-prop="prev" style="color:red"><-</span>
+				<span class="player-control" data-prop="togglePlay" style="color:yellow">-</span>
+				<span class="player-control" data-prop="next" style="color:green">-></span>
+			</p>
 			<p id="status">Now playing: Bios - Guilty Crown</p>
 		</div>
 	</div>
@@ -74,13 +82,16 @@
 						new Song("Silent Solitude - OxT","_4IlQEK1Vug"),
 						new Song("Voracity - MYTH & ROID","D-LXfVLL5Tc"),
 						new Song("Blue Exorcist OP 2","H5wtqQPEpt8"),
-						new Song("Psycho Pass OP 3","fmKPfgsclHg"),
+						new Song("Enigmatic Feeling - Ling Tosite Sigure","fmKPfgsclHg"),
+						new Song("Abnormalize - Ling Tosite Sigure","J6Ja3Vip1tg"),
 						new Song("We Will Rock You - Monster Strike","l8YXfBP3VFM"),
 						new Song("Daze - Mekakucity Actors","jgv-IFmIn8c"),
-						new Song("A Tale of 6 Trillion Nights - IA","EAgk-t2zzqw"),
 						new Song("Pantomime - IA","JAXukKb0fgU"),
 						new Song("Soul Eater OP 1","UAzpX8-P4WE"),
 						new Song("Silly-Go-Round - FictionJunction","GzGWvvYOqK4"),
+						new Song("Mob Psycho OP","l5rPZJiYFfg"),
+						new Song("Fallen - EGOIST", "0lSLpbAxBTA"),
+						new Song("Genesis - Stereo Dive Foundation", "hMKDN6B6fQA"),
 
 	];
 
@@ -130,24 +141,37 @@
 			CUED : 5,
 		};
 
+		document.querySelector("[data-prop='prev']").onclick = prevSong;
+		document.querySelector("[data-prop='next']").onclick = nextSong;
+
+		function nextSong(){
+			if(_model.idx == songList.length -1){
+				_model.idx = 0;
+			} else if(_model.idx <= songList.length -2){
+				_model.idx++;
+			}
+		}
+		function prevSong(){
+			if(_model.idx == 0){
+				_model.idx = songList.length -1;
+			} else {
+				_model.idx--;
+			}
+		}
+
 		var playerEvents = {
 			ready(){},
 			stateChanged(eventData){ 
 				//Wish they would rename this to PLAYER_STATE or something because that's what it really is
 				if(eventData.data == _playerState.ENDED){
 					if(_model.idx > -1 && autoplay){
-						if(_model.idx == songList.length -1){
-							_model.idx = 0;
-							_model.songID = songList[_model.idx].id;
-						} else if(_model.idx <= songList.length -2) {
-							_model.idx++;
-							_model.songID = songList[_model.idx].id;
-						}
+						nextSong();
 					}
 				}
 			 },
 		};
 
+		_model.subscribe("change/idx", function(idx){ console.log(_model.songID = songList[idx.new].id); });
 		_model.subscribe("change/songID",function(id){ 
 			loadVideo(id.new); 
 			_model.currentSong = songList.find(song => song.id == id.new); 
