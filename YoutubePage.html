@@ -56,10 +56,10 @@
 		overflow:hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;
-		-webkit-transition: all 0.4s ease-in;
-    	-moz-transition: all 0.4s ease-in;
-    	-o-transition: all 0.4s ease-in;
-    	transition: all 0.4s ease-in;
+		-webkit-transition: all 0.25s ease-in;
+    	-moz-transition: all 0.25s ease-in;
+    	-o-transition: all 0.25s ease-in;
+    	transition: all 0.25s ease-in;
 	}
 	.player-control {
 		cursor: pointer;
@@ -310,12 +310,12 @@
 		if(rainbow_ref){return;}
 		rainbow_ref = (function(){
 			var counter = 0;
-			var colors = ["red","green","blue","purple"];
+			var colors = ["red","orange","yellow","green","blue","purple"];
 			var _ref = setInterval(function(){
 				counter++;
-				if(counter%4==0){counter = 0;}
-				view.songList.style.background = colors[counter%4];
-			},750);
+				if(counter%6==0){counter = 0;}
+				ui.view.songList().style.background = colors[counter%6];
+			},400);
 			return _ref;
 		})();
 	}
