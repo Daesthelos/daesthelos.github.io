@@ -17,6 +17,14 @@ var ajax = (()=>{
 	  OK : 200,
 	  MULTIPLE_CHOICES : 300,
 	};
+
+	function setRequestHeaders(request,headers){
+		headers.forEach(header=>{
+			var _key = Object.keys(header)[0],
+			    _value = Object.values(header)[0];
+			request.setRequestHeader(_key,_value);
+		});
+	}
   
     return new Promise((resolve, reject) => {
 	  var xhr = new XMLHttpRequest();
@@ -43,7 +51,7 @@ var ajax = (()=>{
 		reject(response);
 	  };
 	  xhr.open(method,url);
-	  if(config.headers && Array.isArray(config.headers)) { config.headers.forEach(x=> xhr.setRequestHeader(x.header,x.value)); }
+	  if(config.headers && Array.isArray(config.headers)) { setRequestHeaders(xhr,config.headers); }
 	  xhr.send(config.data);//accepts data, optionally
 	});
   };

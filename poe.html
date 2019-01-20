@@ -1,9 +1,37 @@
 <!DOCTYPE html>
 <html>
 <head>
-
+<script src="javascript/framework.js"></script>
 </head>
 <body>
+	<script>
+		var endpoint = "https://cors-anywhere.herokuapp.com/http://www.pathofexile.com/api/trade/search/Betrayal";
+		var headers = [
+			{"Content-Type":"application/json"},
+			{"Accept-Language":"en-us"},
+			{"X-Requested-With" : "XMLHttpRequest"},
+			//{"Cookie":"POESESSID=99db6e1b992cd7fa5bc717a81a4bd3f7; _ga=GA1.2.1826094589.1540326097; _gat=1; _gid=GA1.2.1255992888.1548013395; __cfduid=d250d4eb6c4f9fffa4621abeb6e38f46c1543432234; stored_data=1"}
+		];
 
+		var test = "https://cors-anywhere.herokuapp.com/http://api.pathofexile.com/public-stash-tabs";
+
+
+		var currentStashes = [];
+
+		var x = {
+			next_change_id : 0,
+			stashes : [],
+		};
+
+		ajax.get(test).then(data=>{
+			responseData = data.value;
+
+			x.next_change_id = responseData.next_change_id;
+			x.stashes = responseData.stashes.filter(z=>z.public);
+		}).catch(y=>{
+			console.log(y);
+		});
+
+	</script>
 </body>
 </html>
