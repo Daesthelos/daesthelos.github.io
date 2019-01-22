@@ -1,10 +1,11 @@
-//data
+//Classes
    	function Song(title,id){
 		if(!(this instanceof Song)){ throw new Error("song is a constructor and must be called with the new keyword.")}
 		this.title = title;
 		this.id = id;
 	}
 
+//Data
 	//Feels kinda dirty making this global but this needs to be referenced in various different scopes
 	var songList = [	new Song("Unravel - Tokyo Ghoul","QKXi08chD2E"),
 						new Song("God Knows... - The Melancholy of Haruhi Suzumiya","WWB01IuMvzA"),
@@ -24,7 +25,7 @@
 						new Song("Genesis - Stereo Dive Foundation", "hMKDN6B6fQA"),						
 	];
 
-
+//UI object
 	var ui = (function(){
 		var _utils = (function(){
 			function _create(tag,opts = {}){
