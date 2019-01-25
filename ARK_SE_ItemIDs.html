@@ -1,0 +1,517 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<link rel="icon" href="https://fiberblade.net/Assets/img/ark-survival-evolved.png" />
+<title>
+ARK: Survival Evolved ~Item IDs
+</title>
+<style>
+ul>li{
+  list-style-type:none;
+}
+li:before{
+  content: "-";
+}
+label:after{
+  content: ": ";
+}
+table, th, td{
+  border:1px solid black;
+  border-collapse:collapse;
+}
+.hidden{
+  display:none;
+}
+.title{
+  display:inline-block;
+  padding-right:5%;
+  margin-left:40%;
+  text-align:center;
+  width:15%;
+}
+.header > button{
+  display:inline-block;
+  float:right;
+  position:relative;
+  bottom:-2em;
+}
+.nav{
+width:100%;
+}
+.nav-item{
+display:inline-block;
+text-align:center;
+width:22%;
+border:1px solid black;
+cursor:pointer;
+padding:2px;
+}
+.nav-item:hover{
+  background-color:rgb(190,190,190);
+}
+</style>
+</head>
+<body>
+<script>
+var ajax = (function(){
+  function isJSON(str){ 
+    try      {  JSON.parse(str); }
+    catch(e) {  return false;}
+    return true;
+  }
+  function unwrap(obj){
+    var rewrite = {};
+    if(typeof rewrite == 'object'){   
+	  for(var prop in obj){
+	    rewrite[prop] = obj[prop];
+	  }
+	  return rewrite;
+	}
+	return obj; 
+  };
+  
+  function compress(xhr){
+    return {
+	  value : xhr.response,
+	  status: xhr.status,
+	  statusText: xhr.statusText
+	};
+  }
+  
+  function send(method,url,async){
+    return new Promise((resolve, reject) => {
+      var xhr = new XMLHttpRequest();
+  	  if(async === undefined){ async = true; }
+  	  xhr.onload = function(){
+  	    if(this.status >= 200 && this.status < 300){
+		  xhr = unwrap(xhr);
+  	      xhr.response = (isJSON(this.response)) ? JSON.parse(this.response) : this.response;
+  	      xhr.responseText = (isJSON(this.responseText)) ? JSON.parse(this.responseText) : this.responseText;
+  		  resolve( compress(xhr) );
+  	    }
+  	    else{
+  	      xhr = unwrap(xhr);
+  	      xhr.response = (isJSON(this.response)) ? JSON.parse(this.response) : this.response;
+  	      xhr.responseText = (isJSON(this.responseText)) ? JSON.parse(this.responseText) : this.responseText;
+		  reject( compress(xhr) );
+  	    }
+  	  };
+  	  xhr.onerror = () => { reject(this); }
+  	  xhr.open(method,url,async);
+  	  xhr.send();
+    });
+  }
+
+  return {
+    get(url){ return send("GET",url); }  //THIS IS A READ-ONLY resource
+    //put(url,data) { return send("PUT",url); },
+    //post(url,data){ return send("POST",url); },	
+    //'delete' : (url) => { return send("DELETE",url); }
+  };
+})();
+</script>
+<div class="nav">
+<span class="nav-item">Resource Locator</span>
+<span class="nav-item">Resource List</span>
+<span class="nav-item">Admin spawn command formatter</span>
+<hr />
+<div>
+<div id="resourceFinder">
+<h1>Resource Locator</h1>
+<select id="test">
+  <option value="*">All</option>
+</select>
+<label for="txtName">Name</label><input id="txtName" list="catItems" type="text" />
+<datalist id="catItems">
+<option value="Cementing Paste" />
+</datalist>
+<button type="button" id="btnSearch">Search</button>
+</div>
+
+<div id="resourceList">
+<h1 id="tblContents">Table of Contents</h1>
+<ul>
+<li><a href="#resources">Resources</a></li>
+<li><a href="#tools">Tools</a></li>
+<li><a href="#armor">Armor</a></li>
+<li><a href="#saddles">Saddles</a></li>
+<li><a href="#structures">Structures</a></li>
+<li><a href="#dye">Dye</a></li>
+<li><a href="#consumables">Consumables</a></li>
+<li><a href="#recipes">Recipes</a></li>
+<li><a href="#eggs">Eggs</a></li>
+<li><a href="#farming">Farming</a></li>
+<li><a href="#seeds">Seeds</a></li>
+<li><a href="#weapons">Weapons</a></li>
+<li><a href="#ammo">Ammunition</a></li>
+<li><a href="#skins">Skins</a></li>
+<li><a href="#artifacts">Artifacts</a></li>
+<li><a href="#trophy">Trophy</a></li>
+</ul>
+
+</div>
+
+<script>
+var vmData = (function(){
+  var listeners = [],
+      store = {},
+	  keys = ['resources','tools','armor','saddles','structures','dye','consumables','recipes','eggs','farming','seeds','weapons','ammo','skins','artifacts','trophy'];
+  function publish(key,value){ 
+    listeners.forEach(x=>{   	  		  
+	  if(x.dataHandler){
+        x.dataHandler(key,value);
+      }
+	});
+  }
+  
+  var _ = {
+	subscribe(subscriber){ listeners.push(subscriber); },
+    props : keys	
+  };
+  
+  
+  keys.forEach(x=> {
+    Object.defineProperty(_,x, {
+	  get : function(){ return store[x]; },
+	  set : function(value){ 
+	    store[x] = value;
+		publish(x,value);
+	  }
+	});
+  });
+  
+  return _;
+})();
+
+var processor = {
+  gpaResponse(rspObject){
+    var text = rspObject.parse.text['*'],
+	    contentType = "text/html",
+	    parser = new DOMParser(),
+		items = [];
+	
+	var domObject = parser.parseFromString(text,contentType);
+	var rows = Array.from(domObject.querySelectorAll("tr"));
+	
+	rows.forEach((x,idx)=>{
+	  if(idx==0){ return; }
+	  var cells = Array.from(x.querySelectorAll('td'));
+	  items.push({
+	    img : cells.find(y=> y.querySelector('img')).querySelector('img'),
+		name : cells[1].innerText,
+		category : cells[2].innerText,
+		stackSize : parseInt(cells[3].innerText) || 1,
+		itemID : parseInt(cells[4].innerText) || '-',
+		className : cells[5].innerText,
+		bpPath : cells[6].innerText
+	  });
+	});
+	
+	return items;
+  }
+};
+
+var vm = (function(){
+  var utils = {
+    getEl(tag,opts){
+	  var el = document.createElement(tag);
+	  for(var prop in opts){
+	    if(!prop.includes('data')){
+	      el[prop] = opts[prop];
+		}
+		else{
+		  el.dataset[prop.split('-')[1]] = opts[prop];
+		}
+	  }
+	  return el;
+	},
+	templates : {
+      itemCategory(resourceType){
+	    var container = utils.getEl('div',{'className':'itemCat'}),
+		    header = utils.getEl('div',{'className':'header'}),
+			headerItems = [utils.getEl('h1',{'className':'title', 'id' : resourceType, 'innerText' : resourceType.toUpperCase()}),
+			               utils.getEl('a',{'href':'#tblContents','innerText':'to top'}),
+			               utils.getEl('button',{ 'onclick' : function(){ _.ui[resourceType].toggleVis(); }, 'innerText' : 'Toggle Visibility' }),
+						   utils.getEl('button',{ 'onclick' : function(){ _.ui[resourceType].render(); }, 'innerText' : 'Load' })
+			],
+			content = utils.getEl('table',{'data-prop':resourceType})
+			head = utils.getEl('thead',{'className':'hidden'}),
+			headRow = utils.getEl('tr'),
+			headItems = [utils.getEl('th',{'innerText' : 'Icon'}),
+			             utils.getEl('th',{'innerText' : 'Name'}),
+						 utils.getEl('th',{'innerText' : 'Category'}),
+						 utils.getEl('th',{'innerText' : 'Stack Size'}),
+						 utils.getEl('th',{'innerText' : 'Item ID'}),
+						 utils.getEl('th',{'innerText' : 'Class Name'}),
+						 utils.getEl('th',{'innerText' : 'Blueprint Path'})
+			],
+			body = utils.getEl('tbody',{'className':'hidden'});
+			
+			headerItems.forEach(x=> header.appendChild(x));
+			headItems.forEach(x=>headRow.appendChild(x));
+			head.appendChild(headRow);
+			
+			content.appendChild(head);
+			content.appendChild(body);
+			container.appendChild(header);
+			container.appendChild(content);
+			
+			return container;
+	  },
+	  content(data){
+	    var trs = [];
+	    data.forEach(x=>{
+		  var tr = utils.getEl('tr'),
+		      thumbnail = utils.getEl('img',{ 'src' : x.img.src, 'alt':x.img.alt }),
+			  img = utils.getEl('td'),
+		      items = [ utils.getEl('td',{'innerText':x.name}),
+						utils.getEl('td',{'innerText':x.category}),
+						utils.getEl('td',{'innerText':x.stackSize}),
+						utils.getEl('td',{'innerText':x.itemID}),
+						utils.getEl('td',{'innerText':x.className}),
+                        utils.getEl('td',{'innerText':x.bpPath})
+			  ];
+			  
+			  img.appendChild(thumbnail);
+			  tr.appendChild(img);
+			  items.forEach(x=> tr.appendChild(x));
+			  trs.push(tr);
+		});
+		return trs;
+	  },
+	  uiVM(prop){
+	    return {
+	      prop : prop,
+	      data(){ return vmData[this.prop];},
+		  toggleVis(){ Array.from(this.content().children).forEach(x=> x.classList.toggle('hidden')); },
+		  render(){
+		    Array.from(this.content().children).forEach(x=> x.classList.remove('hidden'));
+		    var body = this.content().querySelector('tbody');
+		    body.innerHTML = "";	  
+		    utils.templates.content(this.data()).forEach(x=>{
+		     body.appendChild(x);
+		    });
+		  },
+		  content(){ return document.querySelector('[data-prop="'+ this.prop +'"]'); }
+	    };
+	  }
+	}
+  }; 
+  
+    var _ = {
+    ui : {
+	  resources : utils.templates.uiVM('resources'),
+	  tools : utils.templates.uiVM('tools'),
+	  armor : utils.templates.uiVM('armor'),
+	  saddles : utils.templates.uiVM('saddles'),
+	  structures : utils.templates.uiVM('structures'),
+	  dye : utils.templates.uiVM('dye'),
+	  consumables : utils.templates.uiVM('consumables'),
+	  recipes : utils.templates.uiVM('recipes'),
+	  eggs : utils.templates.uiVM('eggs'),
+	  farming : utils.templates.uiVM('farming'),
+	  seeds : utils.templates.uiVM('seeds'),
+	  weapons : utils.templates.uiVM('weapons'),
+	  ammo : utils.templates.uiVM('ammo'),
+	  skins : utils.templates.uiVM('skins'),
+	  artifacts : utils.templates.uiVM('artifacts'),
+	  trophy : utils.templates.uiVM('trophy'),
+	  resourceFinder : (function(){	
+	    var category = {
+		  key : "*",
+		  value : vmData["*"]
+		};
+	  
+		var finder = {
+		  get selectedCategory(){ return category; },
+		  set selectedCategory(val){ category = val; this.events.updateCatItems(val); },
+		  searchCriteria : "",
+		  resultSet : {
+		    prop : 'resultSet',
+	        data : [],
+		    toggleVis(){ Array.from(this.content().children).forEach(x=> x.classList.toggle('hidden')); },
+		    render(){
+		      Array.from(this.content().children).forEach(x=> x.classList.remove('hidden'));
+		      var body = this.content().querySelector('tbody');
+		      body.innerHTML = "";	  
+		      utils.templates.content(this.data).forEach(x=>{
+		       body.appendChild(x);
+		      });
+		    },
+		    content(){ return document.querySelector('[data-prop="'+ this.prop +'"]'); }
+		  },
+		  events : {
+		    updateCatItems(data){
+			  var list = document.getElementById('catItems');				  
+		      list.innerHTML = "";
+			  
+			  if(data.key=="*"){//all
+			    var tmp = [];
+				vmData.props.forEach(x=>{ if(vmData[x]){ tmp = tmp.concat(vmData[x]);} });
+				data.value = tmp;
+			  }
+			  
+			  data.value.sort((x,y)=> x.name.trim() > y.name.trim()).forEach(z=>{
+			    list.appendChild( utils.getEl('option',{'value':z.name.trim()}) );
+			  });		  
+			}
+		  },
+		  bind : function(){
+		    var listCats = document.getElementById("test"),
+			    txtName = document.getElementById("txtName"),
+				btnSearch = document.getElementById("btnSearch");
+			
+			listCats.onchange = function(){
+			  var key = this.selectedOptions[0].value,
+			      data = vmData[key];
+				  
+			  finder.selectedCategory = {key:key, value : data};
+			};
+			txtName.oninput = function(e){
+			  finder.searchCriteria = e.target.value.trim();
+			};
+			btnSearch.onclick = function(){
+			    var tmp = [];
+				if(finder.selectedCategory.key == "*"){ vmData.props.forEach(x=>{ if(vmData[x]){ tmp = tmp.concat(vmData[x]);} }); }
+				else{ tmp = vmData[finder.selectedCategory.key];}
+				finder.resultSet.data = tmp.filter(x=>x.name.trim().toLowerCase().includes( finder.searchCriteria.toLowerCase() )).sort((y,z)=> y.name.trim() > z.name.trim());
+                finder.resultSet.render();				
+			};
+					
+		    listCats.dataHandler = function(key,value){
+			  var opt = utils.getEl("option",{'value':key,'innerText':key});
+		      listCats.appendChild(opt);	
+			  if(document.getElementById("test").selectedOptions[0].value == "*"){
+			    finder.events.updateCatItems({key:"*",value:undefined});
+			  }
+            };
+			
+			vmData.subscribe(listCats);
+		  }
+		};
+		
+		finder.bind();
+		return finder;
+      })() 
+	}
+  };
+  
+  return {
+    ui : _.ui,
+	tmpl : utils.templates
+  };
+})();
+
+var rsc = (function(){
+  var proxy = "https://cors-anywhere.herokuapp.com/",
+      routes = {
+	    base(){ return "https://ark.gamepedia.com"; },
+	    subQuery(indicator,opts){ 
+          var url = this.base() + "/api.php?",
+	          queryOpts = [],
+	          o = opts ? opts : {
+	            action : "parse",
+	            format : "json",
+	            title : "Item_IDs",
+	          };
+	
+	      for(var prop in o){
+	        queryOpts.push(prop + '=' + o[prop]);
+	      }
+		  url += queryOpts.join('&') + "&" + indicator;
+		  return url;
+	    },
+	    resources(){ return this.subQuery("text={{:Item+IDs/Resources}}"); },
+		tools(){ return this.subQuery("text={{:Item+IDs/Tools}}"); },
+		armor(){ return this.subQuery("text={{:Item+IDs/Armor}}"); },
+		saddles(){ return this.subQuery("text={{:Item+IDs/Saddles}}"); },
+		structures(){ return this.subQuery("text={{:Item+IDs/Structures}}"); },
+		dye(){ return this.subQuery("text={{:Item+IDs/Dye}}"); },
+		consumables(){ return this.subQuery("text={{:Item+IDs/Consumables}}"); },
+		recipes(){ return this.subQuery("text={{:Item+IDs/Recipes}}"); },
+		eggs(){ return this.subQuery("text={{:Item+IDs/Eggs}}"); },
+		farming(){ return this.subQuery("text={{:Item+IDs/Farming}}"); },
+		seeds(){ return this.subQuery("text={{:Item+IDs/Seeds}}"); },
+		weapons(){ return this.subQuery("text={{:Item+IDs/Weapons}}"); },
+		ammunition(){ return this.subQuery("text={{:Item+IDs/Ammunition}}"); },
+		skins(){ return this.subQuery("text={{:Item+IDs/Skins}}"); },
+		artifacts(){ return this.subQuery("text={{:Item+IDs/Artifacts}}"); },
+		trophy(){ return this.subQuery("text={{:Item+IDs/Trophy}}"); },
+		get(prop){
+		  if(this[prop]){
+		    return ajax.get(proxy+this[prop]());
+		  }
+		}
+	};
+  
+  return {
+    baseURL : routes.base(),
+    routes : {
+	  resources(){ return routes.get('resources'); },
+	  tools(){ return routes.get('tools'); },
+	  armor(){ return routes.get('armor'); },
+	  saddles(){ return routes.get('saddles'); },
+	  structures(){ return routes.get('structures'); },
+	  dye(){ return routes.get('dye'); },
+	  consumables(){ return routes.get('consumables'); },
+	  recipes(){ return routes.get('recipes'); },
+	  eggs(){ return routes.get('eggs'); },
+	  farming(){ return routes.get('farming'); },
+	  seeds(){ return routes.get('seeds'); },
+	  weapons(){ return routes.get('weapons'); },
+	  ammo(){ return routes.get('ammunition'); },
+	  skins(){ return routes.get('skins'); },
+	  artifacts(){ return routes.get('artifacts'); },
+	  trophy(){ return routes.get('trophy'); } 
+	}
+  };
+})();
+
+(function(){
+  var fnArray = [];
+  for(var prop in rsc.routes){
+    var tmp = {};
+	tmp[prop] = rsc.routes[prop];
+    fnArray.push(tmp);
+  }
+  
+  Array.from(document.querySelectorAll('[data-prop]')).forEach(x=>{
+	Array.from(x.children).forEach(y=>{
+	  y.classList.add('hidden');
+	});
+  });
+  
+  fnArray.forEach(x=> {
+    var id = Object.keys(x)[0];
+	document.getElementById("resourceList").appendChild( vm.tmpl.itemCategory(id) );
+	x[id]().then(y=> {vmData[id] = processor.gpaResponse(y.value);}).catch(y=> console.log("Failed to query: " + id));
+  });
+  
+  var searchTable = vm.tmpl.itemCategory('resultSet');
+  searchTable.removeChild( searchTable.querySelector('.header') );
+  document.getElementById('resourceFinder').appendChild(searchTable);
+})();
+
+function apiHelp(){
+  console.log("-rsc               :Provides access to APIs and utilities.","\r\n",
+              "--routes           :A list of api routes that this page enables querying of.","\r\n",
+			  "---resources       :Basic ARK resources used to craft other items.","\r\n",
+			  "---tools           :Tools used by our survivor.","\r\n",
+			  "---armor           :Armor and other defensive equipment used by our survivor. Encompasses: Head, Offhand, Chest, Pant, Glove, and Boot slots.","\r\n",
+			  "---saddles         :Saddles used to ride dinosaurs. Includes platform saddles.","\r\n",
+			  "---structures      :Real-world structures crafteable by our survivor. Ranges from building pieces, to crafting stations, to turrets. If you place it down, it's a structure.","\r\n",
+			  "---dye             :Paint used to color stuff.","\r\n",
+			  "---consumables     :If you can swallow it, it's a consuable. Not that you always should...","\r\n",
+			  "---recipes         :Notes that describe cooking special items, including notes themselves.","\r\n",
+			  "---eggs            :Eggs dropped by dinosaurs. There's a lot of eggs.","\r\n",
+			  "---farming         :Poop. Surprise surprise.","\r\n",
+			  "---seeds           :Plantable plant seeds. Water and fertilize them in order to make them grow.","\r\n",
+			  "---weapons         :Weapons and their attachments. Includes spray painters and transponders? These are equipped in the main hand slot.","\r\n",
+			  "---ammo            :Used to load your ranged weapons, be them firearms or bows. Includes Transponder nodes...","\r\n",
+			  "---skins           :Pretty looking things from events/achievements/dlcs/dino kills.","\r\n",
+			  "---artifacts       :Items gained from killing tough dinos, people, and completing caves.","\r\n",
+			  "---trophy          :Gained by doing the most difficult content in the game: bosses, alpha rexes/wyverns/deathworms.");
+};
+</script>
+<div style='text-align: right;position: fixed;z-index:9999999;bottom: 0; width: 100%;cursor: pointer;line-height: 0;display:block !important;'><a title="Hosted on free web hosting 000webhost.com. Host your own website for FREE." target="_blank" href="https://www.000webhost.com/?utm_source=000webhostapp&amp;utm_campaign=000_logo&amp;utm_medium=website&amp;utm_content=footer_img"><img src="https://cdn.000webhost.com/000webhost/logo/footer-powered-by-000webhost-white2.png"  alt="www.000webhost.com"></a></div></body>
+</html>
