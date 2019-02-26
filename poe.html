@@ -11,43 +11,6 @@
 		function resultingMitigationFlat(armor, rawDamage){ return armor*rawDamage/(armor+10*rawDamage); }
 		function defenseFactor(armor, rawDamage){ return (armor)/(10*rawDamage)+1; }
 
-		function parseKeyValuePair(keyValue){
-			var DELIMITER = "=";
-			var key = keyValue.split(DELIMITER)[0],
-			    value = keyValue.split(DELIMITER)[1] || null;
-			return [key,value];
-		}
-
-		//Cookies
-		var cookieUtil = (function(){
-			function getJSONFromCookie(){
-				var cookiePairs = document.cookie.length == 0 
-					? []
-					: document.cookie.split(";").map(keyValuePair => parseKeyValuePair(keyValuePair));
-				var cookieObject = {};
-
-				cookiePairs.forEach(pair => { cookieObject[pair[0]] = pair[1]; });
-				return cookieObject;
-			};
-
-			function getCookieStringFromJSON(cookie){
-				var cookies = Object.keys(cookie).map(key => { return `${key}=${cookie[key]}; `; });
-				return cookies.join();
-			}
-
-			function setCookie(key,value){
-				var cookies = getJSONFromCookie();
-				cookies[key] = value;
-				document.cookie = getCookieStringFromJSON(cookies);
-			}
-
-			return {
-				getCookieJSON : getJSONFromCookie,
-				getCookieFromJSON : getCookieStringFromJSON,
-				setCookie : setCookie,
-			};
-		})();
-
 		var poe_data = (function(){
 			function Member(name, rank, lastOnline, challengeCount){
 				if(!(this instanceof Member)){ throw new Error("Must use new keyword with Member class"); }
@@ -57,40 +20,62 @@
 
 		//API
 		var api = (function(){
-			var root = "https://www.pathofexile.com",
+			var _root = "https://www.pathofexile.com",
 			    cors_service = "https://cors-anywhere.herokuapp.com";
 
-			var guildIDs = {
-				dirty_plebs : 463896,
+			var cors_root = `${cors_service}/${_root}`;
+
+			var endpoints = {
+				characters : "character-window/get-characters",
+				characterItems : "character-window/get-items",
+				characterPassives : "character-window/get-passive-skills",
+				stashItems : "character-window/get-stash-items",
+				mtxStashItems : "character-window/get-mtx-stash-items",
+				accountForCharacter : "character-window/get-account-name-by-character",
 			};
 
-			function getGuildPage(guildID){
-				console.log("boo", document.cookie);
-				var endpoint = `guild/profile/${guildID}`;
-				ajax.get(`${cors_service}/${root}/${endpoint}`)
-					.then(response => {
-						var value = response.value;
-
-					})
-					.catch(fail => {});
+			function _get(endpoint, values){
+				var queryString = convertJSONToQueryString(values);
+				return ajax.get(`${cors_root}/${endpoint}${queryString}`);
 			}
 
-			function parseGuildPageForMembers(){}
-
-			function setPOESessID(sessionID){
-				cookieUtil.setCookie("POESESSID", sessionID);
+			function getCharacters(accountName){ return _get(endpoints.characters, { 'accountName' : accountName }); }
+			function getCharacterItems(accountName, character){ 
+				return _get(endpoints.characterItems,{ 'accountName' : accountName, 'character' : character });
 			}
+			//reqData is 0 or 1, setting to 1 seems to give detailed passive info
+			function getCharacterPassives(accountName, character, reqData){
+				return _get(endpoints.characterItems,{ 'accountName' : accountName, 'character' : character, 'reqData' : reqData });
+			}
+			//tabs is 0 or 1, indicates whether to show name, position, colors. Sig: String, String, Number, Number
+			//Requires POE SESSION ID, which can't be set from a web browser
+			function getStashItems(league,accountName,tabs,tabIndex){
+				return _get(endpoints.stashItems,
+					{ 'league' : league, 'accountName' : accountName,'tabs' : tabs, 'tabIndex' : tabIndex });
+			}
+			function getAccountForCharacter(characterName){ return _get(endpoints.accountForCharacter, { character : characterName }); }
 
-			setPOESessID("b4f8eff3c8588a48552a96e86b15d8a1");
+
+			function convertJSONToQueryString(parameters){
+				var joinedParameters = Object.keys(parameters).map(key => `${key}=${parameters[key]}`).join("&");
+				return `?${joinedParameters}`;
+			}
 
 			return {
-				guilds : guildIDs,
-				getGuildData : getGuildPage,
+				account : {
+					characters : getCharacters,
+					character : {
+						items : getCharacterItems,
+						passives : getCharacterPassives,
+					},
+					findByCharacter : getAccountForCharacter,
+				},
+				test : function(){ return ajax.get(cors_root); },
 			};
 		})();
 
 
-		api.getGuildData(api.guilds.dirty_plebs);
+		//ajax.get("https://cors-anywhere.herokuapp.com/https://www.pathofexile.com/character-window/get-items?accountName=daesthelos&character=Hvel");
 
 
 		var endpoint = "https://cors-anywhere.herokuapp.com/http://www.pathofexile.com/api/trade/search/Betrayal";
