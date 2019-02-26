@@ -32,6 +32,9 @@
 				stashItems : "character-window/get-stash-items",
 				mtxStashItems : "character-window/get-mtx-stash-items",
 				accountForCharacter : "character-window/get-account-name-by-character",
+				seasons : "api/seasons",
+				leagues : "api/leagues",
+				leagueRules : "",
 			};
 
 			function _get(endpoint, values){
@@ -54,22 +57,45 @@
 					{ 'league' : league, 'accountName' : accountName,'tabs' : tabs, 'tabIndex' : tabIndex });
 			}
 			function getAccountForCharacter(characterName){ return _get(endpoints.accountForCharacter, { character : characterName }); }
-
+			function getSeasons(){ return _get(endpoints.seasons); }
+			/*
+			*String type: main/event/season;
+			*			  main = main leagues (ones from character screen), event = event leagues, season = particular season league 
+			*String season: season id, required when type is season
+			*Number compat: 0 or 1; 0 is full info for leagues (max 50), 1 is compact info (max 230)
+			*Number limit: default max from compat; limits number of leagues retrieved
+			*Number offset: Default 0; offsets first league entry to include
+			*String callback: jsonp callback
+			*/
+			function getLeagues(type,season,compat,limit,offset,callback){
+				return _get(endpoints.leagues,
+				 {'type' : type, 'season' : season, 'compat' : compat, 'limit' : limit, 'offset' : offset, 'callback' : callback});
+			}
+			//ID is just the name of the league e.g. Betrayal
+			//Track: adds unique id's for characters returned
+			function getLeague(id, ladder, ladderLimit, ladderOffset, ladderTrack, callback){
+				return _get(`${endpoints.leagues}/${id}`, 
+					{ 'ladder' : ladder, 'ladderLimit' : ladderLimit, 'ladderOffset' : ladderOffset, 'ladderTrack' : ladderTrack, 'callback' : callback});
+			}
 
 			function convertJSONToQueryString(parameters){
+				if(parameters == null){ return ""; }
 				var joinedParameters = Object.keys(parameters).map(key => `${key}=${parameters[key]}`).join("&");
 				return `?${joinedParameters}`;
 			}
 
 			return {
 				account : {
-					characters : getCharacters,
+					characters : getCharacters, //accountName
 					character : {
-						items : getCharacterItems,
-						passives : getCharacterPassives,
+						items : getCharacterItems, //accountName, characterName
+						passives : getCharacterPassives, //accountName, characterName, reqData
 					},
-					findByCharacter : getAccountForCharacter,
+					findByCharacter : getAccountForCharacter, //characterName
 				},
+				seasons: getSeasons, //null
+				leagues : getLeagues, //type,season,compat,limit,offset,callback
+				league : getLeague, //id, ladder, ladderLimit, ladderOffset, ladderTrack, callback
 				test : function(){ return ajax.get(cors_root); },
 			};
 		})();
