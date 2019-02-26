@@ -5,6 +5,94 @@
 </head>
 <body>
 	<script>
+		function relativeDamageReduction(armor, rawDamage){ return armor/(armor+10*rawDamage);  }
+		function requiredArmorRating(rawDamage, relativeDamageReduced){ return (relativeDamageReduced*10*rawDamage)/(1-relativeDamageReduced); }
+		function resultingDamage(armor, rawDamage){ return 10*Math.pow(rawDamage)/(armor+10*rawDamage); }
+		function resultingMitigationFlat(armor, rawDamage){ return armor*rawDamage/(armor+10*rawDamage); }
+		function defenseFactor(armor, rawDamage){ return (armor)/(10*rawDamage)+1; }
+
+		function parseKeyValuePair(keyValue){
+			var DELIMITER = "=";
+			var key = keyValue.split(DELIMITER)[0],
+			    value = keyValue.split(DELIMITER)[1] || null;
+			return [key,value];
+		}
+
+		//Cookies
+		var cookieUtil = (function(){
+			function getJSONFromCookie(){
+				var cookiePairs = document.cookie.length == 0 
+					? []
+					: document.cookie.split(";").map(keyValuePair => parseKeyValuePair(keyValuePair));
+				var cookieObject = {};
+
+				cookiePairs.forEach(pair => { cookieObject[pair[0]] = pair[1]; });
+				return cookieObject;
+			};
+
+			function getCookieStringFromJSON(cookie){
+				var cookies = Object.keys(cookie).map(key => { return `${key}=${cookie[key]}; `; });
+				return cookies.join();
+			}
+
+			function setCookie(key,value){
+				var cookies = getJSONFromCookie();
+				cookies[key] = value;
+				document.cookie = getCookieStringFromJSON(cookies);
+			}
+
+			return {
+				getCookieJSON : getJSONFromCookie,
+				getCookieFromJSON : getCookieStringFromJSON,
+				setCookie : setCookie,
+			};
+		})();
+
+		var poe_data = (function(){
+			function Member(name, rank, lastOnline, challengeCount){
+				if(!(this instanceof Member)){ throw new Error("Must use new keyword with Member class"); }
+
+			};
+		})();
+
+		//API
+		var api = (function(){
+			var root = "https://www.pathofexile.com",
+			    cors_service = "https://cors-anywhere.herokuapp.com";
+
+			var guildIDs = {
+				dirty_plebs : 463896,
+			};
+
+			function getGuildPage(guildID){
+				console.log("boo", document.cookie);
+				var endpoint = `guild/profile/${guildID}`;
+				ajax.get(`${cors_service}/${root}/${endpoint}`)
+					.then(response => {
+						var value = response.value;
+
+					})
+					.catch(fail => {});
+			}
+
+			function parseGuildPageForMembers(){}
+
+			function setPOESessID(sessionID){
+				cookieUtil.setCookie("POESESSID", sessionID);
+			}
+
+			setPOESessID("b4f8eff3c8588a48552a96e86b15d8a1");
+
+			return {
+				guilds : guildIDs,
+				getGuildData : getGuildPage,
+			};
+		})();
+
+
+		api.getGuildData(api.guilds.dirty_plebs);
+
+
 		var endpoint = "https://cors-anywhere.herokuapp.com/http://www.pathofexile.com/api/trade/search/Betrayal";
 		var headers = [
 			{"Content-Type":"application/json"},
@@ -15,6 +103,9 @@
 
 		var test = "https://cors-anywhere.herokuapp.com/http://api.pathofexile.com/public-stash-tabs";
 
+		var _POESESSID = "POESESSID=b4f8eff3c8588a48552a96e86b15d8a1"
+
+		var root = "https://www.pathofexile.com/";
 
 		var currentStashes = [];
 
@@ -23,14 +114,14 @@
 			stashes : [],
 		};
 
-		ajax.get(test).then(data=>{
+		/*ajax.get(test).then(data=>{
 			responseData = data.value;
 
 			x.next_change_id = responseData.next_change_id;
 			x.stashes = responseData.stashes.filter(z=>z.public);
 		}).catch(y=>{
 			console.log(y);
-		});
+		});*/
 
 	</script>
 </body>
