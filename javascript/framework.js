@@ -26,6 +26,7 @@ var ajax = (()=>{
 		});
 	}
   
+	//TODO: convert resolve and reject signatures to (data, statusCode, statusText)
     return new Promise((resolve, reject) => {
 	  var xhr = new XMLHttpRequest();
 	  xhr.onload = function(){
@@ -36,7 +37,6 @@ var ajax = (()=>{
 			},
 			value : tryParseJSON(xhr.response),
 		  };
-		  
 		  if(this.status >= STATUS_CODE.OK && this.status < STATUS_CODE.MULTIPLE_CHOICES){ resolve(response); } 
 		  else { reject(response); }
 	  };

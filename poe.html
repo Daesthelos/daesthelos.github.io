@@ -34,7 +34,21 @@
 				accountForCharacter : "character-window/get-account-name-by-character",
 				seasons : "api/seasons",
 				leagues : "api/leagues",
-				leagueRules : "",
+				leagueRules : "api/league-rules",
+				ladders : "api/ladders",
+				pvpMatches: "pvp-matches",
+				publicStashTabs: "api/public-stash-tabs",
+				gggInnerStashTabs : "api/ggg-inner-stash-tabs", //Unknown if usable/actual endpoint
+				microtransactionSpecials : "api/shop/microtransactions/specials",
+				tradeLeagues : "api/trade/data/leagues",
+				tradeItems : "api/trade/data/items",
+				tradeStats : "api/trade/data/stats",
+				tradeStatic : "api/trade/data/static",
+				tradeSearch : "api/trade/search",
+				tradeFetch : "api/trade/fetch",
+				ignoreList : "api/trade/ignore",//Unauthorized? Do you need to be logged in? GET
+				ignoreAccount : "api/trade/ignore", //PUT also unsure how to use this; "api/trade/ignore/{account}"
+				unignoreAccount : "api/trade/ignore",//DELETE see above "api/trade/ignore/{account}"
 			};
 
 			function _get(endpoint, values){
@@ -78,12 +92,79 @@
 					{ 'ladder' : ladder, 'ladderLimit' : ladderLimit, 'ladderOffset' : ladderOffset, 'ladderTrack' : ladderTrack, 'callback' : callback});
 			}
 
+			function getLeagueRules(callback){ return _get(endpoints.leagueRules, { 'callback' : callback }); }
+			function getLeagueRule(id,callback){ return _get(`${endpoints.leagueRules}/${id}`, { 'callback' : callback}); }
+			/*
+			*String leagueID: id (name) of league you wanna retrieve
+			*Number limit: limit, default 20
+			*Number offset: offset, default 0
+			*String type: type of ladder, values: [ league (default), pvp, labyrinth ]
+			*Bool/string track: adds unique ids for each character
+			*String accountName: league only; filters within first 15k results
+			*String difficulty: Standard (1), Cruel (2), Merciless (3) *Likely outdated API
+			*String start : Lab only, timestamp of ladder you want
+			*String callback: callback
+			*/
+			function getLadder(leagueID, limit, offset, type, track, accountName, difficulty, start, callback){
+				return _get(`${endpoints.ladders}/${leagueID}`, 
+					{'limit' : limit, 'offset' : offset, 'type' : type, 'track' : track, 'accountName' : accountName, 'difficulty' : difficulty, 'start' : start, 'callback' : callback });
+			}
+			function getPVPMatches(seasonID, callback){ //DOC: https://www.pathofexile.com/developer/docs/api-resource-pvp-matches
+				var _type = "season"; //This does not change, according to the doc
+				return _get(endpoints.pvpMatches, {'type' : _type, 'seasonID' : seasonID, 'callback' : callback});
+			}
+			function getPublicStashTabs(id){ return _get(endpoints.publicStashTabs, { 'id': id }); } //id is next-change-id, acquired from previous calls
+			function getMTXSpecials(limit){
+				var _type = "active"; //DOC: https://app.swaggerhub.com/apis/Chuanhsing/poe/1.0.0#/default/get_api_shop_microtransactions_specials says only active type is available. Seems to be optional
+				return _get(endpoints.microtransactionSpecials, {'type' : type, 'limit' : limit});
+			}
+			function getTradeLeagues(){ return _get(endpoints.tradeLeagues); } 
+			function getTradeItems(){ return _get(endpoints.tradeItems); }//Contains equipment, uniques, etc
+			function getTradeStats(){ return _get(endpoints.tradeStats); }//Returns item mods, not trade statistics
+			function getTradeStatic(){ return _get(endpoints.tradeStatic); } //Contains currency, maps, etc
+			function searchTrade(league){ //returns a list of query id's
+				function _post(){ return true; }// would need a working ajax posting function
+				return _post();
+			}
+			//Items is an id that resulted from searching
+			function getTrade(items, query){ return _get(`${endpoints.tradeFetch}/${items}`, {"query" : query}); }
+
 			function convertJSONToQueryString(parameters){
 				if(parameters == null){ return ""; }
 				var joinedParameters = Object.keys(parameters).map(key => `${key}=${parameters[key]}`).join("&");
 				return `?${joinedParameters}`;
 			}
 
+			/*
+			* Hierarchy:
+			*
+			*api
+			*-account
+			*--characters
+			*--character
+			*---items
+			*---passives
+			*--findByCharacter
+			*-seasons
+			*-leagues
+			*-league
+			*-rules
+			*--leagues
+			*--league
+			*-ladder
+			*-pvp
+			*--matches
+			*-stash-tabs
+			*--public
+			*-microtransactions
+			*--specials
+			*-trade
+			*--leagues
+			*--items
+			*--mods
+			*--static
+			*--findTradeDetails
+			*/
 			return {
 				account : {
 					characters : getCharacters, //accountName
@@ -93,9 +174,31 @@
 					},
 					findByCharacter : getAccountForCharacter, //characterName
 				},
-				seasons: getSeasons, //null
-				leagues : getLeagues, //type,season,compat,limit,offset,callback
+				ladder : getLadder, //leagueID, limit, offset, track, accountName, difficulty, start, callback
 				league : getLeague, //id, ladder, ladderLimit, ladderOffset, ladderTrack, callback
+				leagues : getLeagues, //type,season,compat,limit,offset,callback
+				microtransactions : { 
+					specials : getMTXSpecials, //limit
+				},
+				pvp : {
+					matches : getPVPMatches, //seasonID, callback
+				},
+				rules : {
+					leagues : getLeagueRules, //callback
+					league : getLeagueRule, //id, callback
+				},
+				seasons: getSeasons, //null
+				stash_tabs : {
+					public : getPublicStashTabs, //id
+				},
+				trade : {
+					leagues : getTradeLeagues, //null
+					items : getTradeItems, //null
+					mods : getTradeStats, //null
+					static : getTradeStatic, //null
+					//search : searchTrade, //Requires POST functionality
+					findTradeDetails : getTrade, //items, query
+				},
 				test : function(){ return ajax.get(cors_root); },
 			};
 		})();
