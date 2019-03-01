@@ -2,241 +2,33 @@
 <html>
 <head>
 <script src="javascript/framework.js"></script>
+<script src="javascript/poe_endpoints.js"></script>
 </head>
 <body>
-	<script>
-		function relativeDamageReduction(armor, rawDamage){ return armor/(armor+10*rawDamage);  }
-		function requiredArmorRating(rawDamage, relativeDamageReduced){ return (relativeDamageReduced*10*rawDamage)/(1-relativeDamageReduced); }
-		function resultingDamage(armor, rawDamage){ return 10*Math.pow(rawDamage)/(armor+10*rawDamage); }
-		function resultingMitigationFlat(armor, rawDamage){ return armor*rawDamage/(armor+10*rawDamage); }
-		function defenseFactor(armor, rawDamage){ return (armor)/(10*rawDamage)+1; }
-
-		var poe_data = (function(){
-			function Member(name, rank, lastOnline, challengeCount){
-				if(!(this instanceof Member)){ throw new Error("Must use new keyword with Member class"); }
-
-			};
-		})();
-
-		//API
-		var api = (function(){
-			var _root = "https://www.pathofexile.com",
-			    cors_service = "https://cors-anywhere.herokuapp.com";
-
-			var cors_root = `${cors_service}/${_root}`;
-
-			var endpoints = {
-				characters : "character-window/get-characters",
-				characterItems : "character-window/get-items",
-				characterPassives : "character-window/get-passive-skills",
-				stashItems : "character-window/get-stash-items",
-				mtxStashItems : "character-window/get-mtx-stash-items",
-				accountForCharacter : "character-window/get-account-name-by-character",
-				seasons : "api/seasons",
-				leagues : "api/leagues",
-				leagueRules : "api/league-rules",
-				ladders : "api/ladders",
-				pvpMatches: "pvp-matches",
-				publicStashTabs: "api/public-stash-tabs",
-				gggInnerStashTabs : "api/ggg-inner-stash-tabs", //Unknown if usable/actual endpoint
-				microtransactionSpecials : "api/shop/microtransactions/specials",
-				tradeLeagues : "api/trade/data/leagues",
-				tradeItems : "api/trade/data/items",
-				tradeStats : "api/trade/data/stats",
-				tradeStatic : "api/trade/data/static",
-				tradeSearch : "api/trade/search",
-				tradeFetch : "api/trade/fetch",
-				ignoreList : "api/trade/ignore",//Unauthorized? Do you need to be logged in? GET
-				ignoreAccount : "api/trade/ignore", //PUT also unsure how to use this; "api/trade/ignore/{account}"
-				unignoreAccount : "api/trade/ignore",//DELETE see above "api/trade/ignore/{account}"
-			};
-
-			function _get(endpoint, values){
-				var queryString = convertJSONToQueryString(values);
-				return ajax.get(`${cors_root}/${endpoint}${queryString}`);
-			}
-
-			function getCharacters(accountName){ return _get(endpoints.characters, { 'accountName' : accountName }); }
-			function getCharacterItems(accountName, character){ 
-				return _get(endpoints.characterItems,{ 'accountName' : accountName, 'character' : character });
-			}
-			//reqData is 0 or 1, setting to 1 seems to give detailed passive info
-			function getCharacterPassives(accountName, character, reqData){
-				return _get(endpoints.characterItems,{ 'accountName' : accountName, 'character' : character, 'reqData' : reqData });
-			}
-			//tabs is 0 or 1, indicates whether to show name, position, colors. Sig: String, String, Number, Number
-			//Requires POE SESSION ID, which can't be set from a web browser
-			function getStashItems(league,accountName,tabs,tabIndex){
-				return _get(endpoints.stashItems,
-					{ 'league' : league, 'accountName' : accountName,'tabs' : tabs, 'tabIndex' : tabIndex });
-			}
-			function getAccountForCharacter(characterName){ return _get(endpoints.accountForCharacter, { character : characterName }); }
-			function getSeasons(){ return _get(endpoints.seasons); }
-			/*
-			*String type: main/event/season;
-			*			  main = main leagues (ones from character screen), event = event leagues, season = particular season league 
-			*String season: season id, required when type is season
-			*Number compat: 0 or 1; 0 is full info for leagues (max 50), 1 is compact info (max 230)
-			*Number limit: default max from compat; limits number of leagues retrieved
-			*Number offset: Default 0; offsets first league entry to include
-			*String callback: jsonp callback
-			*/
-			function getLeagues(type,season,compat,limit,offset,callback){
-				return _get(endpoints.leagues,
-				 {'type' : type, 'season' : season, 'compat' : compat, 'limit' : limit, 'offset' : offset, 'callback' : callback});
-			}
-			//ID is just the name of the league e.g. Betrayal
-			//Track: adds unique id's for characters returned
-			function getLeague(id, ladder, ladderLimit, ladderOffset, ladderTrack, callback){
-				return _get(`${endpoints.leagues}/${id}`, 
-					{ 'ladder' : ladder, 'ladderLimit' : ladderLimit, 'ladderOffset' : ladderOffset, 'ladderTrack' : ladderTrack, 'callback' : callback});
-			}
-
-			function getLeagueRules(callback){ return _get(endpoints.leagueRules, { 'callback' : callback }); }
-			function getLeagueRule(id,callback){ return _get(`${endpoints.leagueRules}/${id}`, { 'callback' : callback}); }
-			/*
-			*String leagueID: id (name) of league you wanna retrieve
-			*Number limit: limit, default 20
-			*Number offset: offset, default 0
-			*String type: type of ladder, values: [ league (default), pvp, labyrinth ]
-			*Bool/string track: adds unique ids for each character
-			*String accountName: league only; filters within first 15k results
-			*String difficulty: Standard (1), Cruel (2), Merciless (3) *Likely outdated API
-			*String start : Lab only, timestamp of ladder you want
-			*String callback: callback
-			*/
-			function getLadder(leagueID, limit, offset, type, track, accountName, difficulty, start, callback){
-				return _get(`${endpoints.ladders}/${leagueID}`, 
-					{'limit' : limit, 'offset' : offset, 'type' : type, 'track' : track, 'accountName' : accountName, 'difficulty' : difficulty, 'start' : start, 'callback' : callback });
-			}
-			function getPVPMatches(seasonID, callback){ //DOC: https://www.pathofexile.com/developer/docs/api-resource-pvp-matches
-				var _type = "season"; //This does not change, according to the doc
-				return _get(endpoints.pvpMatches, {'type' : _type, 'seasonID' : seasonID, 'callback' : callback});
-			}
-			function getPublicStashTabs(id){ return _get(endpoints.publicStashTabs, { 'id': id }); } //id is next-change-id, acquired from previous calls
-			function getMTXSpecials(limit){
-				var _type = "active"; //DOC: https://app.swaggerhub.com/apis/Chuanhsing/poe/1.0.0#/default/get_api_shop_microtransactions_specials says only active type is available. Seems to be optional
-				return _get(endpoints.microtransactionSpecials, {'type' : type, 'limit' : limit});
-			}
-			function getTradeLeagues(){ return _get(endpoints.tradeLeagues); } 
-			function getTradeItems(){ return _get(endpoints.tradeItems); }//Contains equipment, uniques, etc
-			function getTradeStats(){ return _get(endpoints.tradeStats); }//Returns item mods, not trade statistics
-			function getTradeStatic(){ return _get(endpoints.tradeStatic); } //Contains currency, maps, etc
-			function searchTrade(league){ //returns a list of query id's
-				function _post(){ return true; }// would need a working ajax posting function
-				return _post();
-			}
-			//Items is an id that resulted from searching
-			function getTrade(items, query){ return _get(`${endpoints.tradeFetch}/${items}`, {"query" : query}); }
-
-			function convertJSONToQueryString(parameters){
-				if(parameters == null){ return ""; }
-				var joinedParameters = Object.keys(parameters).map(key => `${key}=${parameters[key]}`).join("&");
-				return `?${joinedParameters}`;
-			}
-
-			/*
-			* Hierarchy:
-			*
-			*api
-			*-account
-			*--characters
-			*--character
-			*---items
-			*---passives
-			*--findByCharacter
-			*-seasons
-			*-leagues
-			*-league
-			*-rules
-			*--leagues
-			*--league
-			*-ladder
-			*-pvp
-			*--matches
-			*-stash-tabs
-			*--public
-			*-microtransactions
-			*--specials
-			*-trade
-			*--leagues
-			*--items
-			*--mods
-			*--static
-			*--findTradeDetails
-			*/
-			return {
-				account : {
-					characters : getCharacters, //accountName
-					character : {
-						items : getCharacterItems, //accountName, characterName
-						passives : getCharacterPassives, //accountName, characterName, reqData
-					},
-					findByCharacter : getAccountForCharacter, //characterName
-				},
-				ladder : getLadder, //leagueID, limit, offset, track, accountName, difficulty, start, callback
-				league : getLeague, //id, ladder, ladderLimit, ladderOffset, ladderTrack, callback
-				leagues : getLeagues, //type,season,compat,limit,offset,callback
-				microtransactions : { 
-					specials : getMTXSpecials, //limit
-				},
-				pvp : {
-					matches : getPVPMatches, //seasonID, callback
-				},
-				rules : {
-					leagues : getLeagueRules, //callback
-					league : getLeagueRule, //id, callback
-				},
-				seasons: getSeasons, //null
-				stash_tabs : {
-					public : getPublicStashTabs, //id
-				},
-				trade : {
-					leagues : getTradeLeagues, //null
-					items : getTradeItems, //null
-					mods : getTradeStats, //null
-					static : getTradeStatic, //null
-					//search : searchTrade, //Requires POST functionality
-					findTradeDetails : getTrade, //items, query
-				},
-				test : function(){ return ajax.get(cors_root); },
-			};
-		})();
+	<p>Available features:</p>
+	<ul>
+		<li>Account Character List</li>
+		<li>Show Character Equipment</li>
+		<li>Show Character Passives</li>
+		<li>Find Account for Character</li>
+		<li>Show Ladder</li>
+		<li>Show League Info</li>
+		<li>Show All Leagues</li>
+		<li>Show Active MTX Specials</li>
+		<li>Show PVP Matches</li>
+		<li>Show League Rules</li>
+		<li>Show League Rule Description</li>
+		<li>Show Seasons</li>
+		<li>Show Public Stash Tabs</li>
+		<li>Show Current Leagues</li>
+		<li>Show Item List</li>
+		<li>Show Mod List</li>
+		<li>Show Static Item List</li>
+		<li>Show Trade Items for Trade</li>
+	</ul>
 
 
-		//ajax.get("https://cors-anywhere.herokuapp.com/https://www.pathofexile.com/character-window/get-items?accountName=daesthelos&character=Hvel");
-
-
-		var endpoint = "https://cors-anywhere.herokuapp.com/http://www.pathofexile.com/api/trade/search/Betrayal";
-		var headers = [
-			{"Content-Type":"application/json"},
-			{"Accept-Language":"en-us"},
-			{"X-Requested-With" : "XMLHttpRequest"},
-			//{"Cookie":"POESESSID=99db6e1b992cd7fa5bc717a81a4bd3f7; _ga=GA1.2.1826094589.1540326097; _gat=1; _gid=GA1.2.1255992888.1548013395; __cfduid=d250d4eb6c4f9fffa4621abeb6e38f46c1543432234; stored_data=1"}
-		];
-
-		var test = "https://cors-anywhere.herokuapp.com/http://api.pathofexile.com/public-stash-tabs";
-
-		var _POESESSID = "POESESSID=b4f8eff3c8588a48552a96e86b15d8a1"
-
-		var root = "https://www.pathofexile.com/";
-
-		var currentStashes = [];
-
-		var x = {
-			next_change_id : 0,
-			stashes : [],
-		};
-
-		/*ajax.get(test).then(data=>{
-			responseData = data.value;
-
-			x.next_change_id = responseData.next_change_id;
-			x.stashes = responseData.stashes.filter(z=>z.public);
-		}).catch(y=>{
-			console.log(y);
-		});*/
-
-	</script>
+	<script src="javascript/poe_apis.js"></script>
+	<script src="javascript/poe.js"></script>
 </body>
 </html>

@@ -26,28 +26,27 @@ var ajax = (()=>{
 		});
 	}
   
-	//TODO: convert resolve and reject signatures to (data, statusCode, statusText)
+	//Due to Promise implementation, resolve/reject does not support (data, statusCode, statusText)
+	//However, array destructuring is a thing so use that instead. Not supported in IE, and experimental in Edge14
+	/*
+	* 	  var response = {
+	*	    status : {
+	*		  code : xhr.status,
+	*		  text : xhr.statusText,
+	*		},
+	*		value : tryParseJSON(xhr.response),
+	*	  };
+	*/
     return new Promise((resolve, reject) => {
 	  var xhr = new XMLHttpRequest();
 	  xhr.onload = function(){
-	      var response = {
-		    status : {
-			  code : xhr.status,
-			  text : xhr.statusText,
-			},
-			value : tryParseJSON(xhr.response),
-		  };
+		  //[data, statusCode, statusText]
+		  var response = [tryParseJSON(xhr.response), xhr.status, xhr.statusText];
 		  if(this.status >= STATUS_CODE.OK && this.status < STATUS_CODE.MULTIPLE_CHOICES){ resolve(response); } 
 		  else { reject(response); }
 	  };
 	  xhr.onerror = function(){
-		var response = {
-		    status : {
-			  code : xhr.status,
-			  text : xhr.statusText,
-			},
-			value : tryParseJSON(xhr.response),
-		  };
+		var response = [tryParseJSON(xhr.response), xhr.status, xhr.statusText];
 		reject(response);
 	  };
 	  xhr.open(method,url);

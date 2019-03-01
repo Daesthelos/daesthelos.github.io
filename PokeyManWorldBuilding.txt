@@ -1,0 +1,82 @@
+Pokes
+Wooter
+Leef
+Hot
+
+Hot > Leef
+Leef > Wet
+Wet > Hot
+
+Stats:
+HP -> Life points
+Attack -> Physical attacks
+Special Attack -> Elemental/Magical attacks
+Defense -> Physical defense
+Special Defense -> Elemental/Magical Defense
+Speed -> Attack/Movement speed
+Luck -> Luck, affects critical hit chance
+
+WillPower -> Esoteric modifier on all stats, exponential vs linear modifier
+Accuracy -> Affects hit chance
+Evasion -> Affects dodge chance
+
+Normal damage multiplier: 1.0
+Super Effective multiplier: 2.0
+Critical damage multiplier : 1.5
+
+Attacks have hit chance, more powerful moves will have either less hit chance, drawbacks, or less PP
+
+Run away has a chance of success, based on luck and speed
+
+Totals: 12
+
+Hot : High Atk/Speed/Special Atk/Will, Med Acc, Low Def/SpDef/HP/Eva, Med Luck (Slow growth) 3+3+3+1+1+1
+Leef: High HP/Sp Def/Acc, Med Def/SpAtk/Will, Low Speed/Attack/Eva, Low Luck (Fast growth) 3+3+2+2+1+1
+Wet: High Def/Eva, Med HP/Attack/SpDef/Speed/Acc, low SpAtk/Will, High Luck (Medium growth) 3+2+2+2+2+1
+
+Slime (Wet) -> Big Slime (Wet) -> Beeg Slime (Wet)
+Weed (Leef) -> Bush (Leef) ->  Shrubbery (Leef)
+Onion (Hot) -> Salsa (Hot) -> Taco Hell (Hot)
+
+Sprout (leef) -> sapling (leef) -> tree (leef)
+
+Storyline
+You, a neckbear, living in your mother's basement
+Your mother is a very nice person by the way
+Hear about normies taking over the national WoW Convention
+Work your way up through the local WoW conventions, fight the local nerd for a "badge"
+Beat your competition unconscious and take their money
+And finally challenge those normies and take your spot as the #1 neckbeard
+Before going back home to your mother's basement and drinking nacho cheese
+
+
+--Normie--
+Slap - basic damaging move, low attack power, high hit rate
+Heckle - Affected by Opponents willpower: lowers defense based on willpower and lowers willpower 1 stage
+Butt Wiggle - Affected by Opponents willpower: lowers attack based on willpower and lowers willpower 1 stage
+
+Hot
+Warm - basic hot damaging move, low attack power, high hit rate, low burn chance
+Bake - increase Sp Atk 1 stage
+Anger - increase Atk/Spd/WillPower 1 stage, Accuracy/Defense/SpDef 1 stage
+
+Wet
+Spit - basic wet damaging move, low attack power, high hit rate, low chance to decrease Speed/Accuracy 1 stage
+Drink - Smol health restore, WillPower increased 1 stage
+Shrink - increase Eva/Def 1 stage
+
+Leef
+Leech - basic leef damaging move, low attack power, high hit rate, recover HP based off damage (small)
+PhotoSynthesis - Beeg health recover, low PP
+Grow - increase Def/SpDef 1 stage, decrease Speed/Evasion 1 stage
+
+
+Town 1:
+
+Needs to be able to contain all starting players
+
+Mega apartment complex?
+
+Early 2k
+Need scenary, forests, nice cities, etc reasonably modern but not futuristic
+Caves, etc think LeafGreen/FireRed
