@@ -88,6 +88,7 @@ var endpoints = (function(enableCors){
 	endpoint.api.trade.data.addRoutes([
 		["leagues","leagues"],
 		["items", "items"],
+		["stats","stats"],
 		["static","static"],
 		["search","search"],
 		["fetch","fetch"],

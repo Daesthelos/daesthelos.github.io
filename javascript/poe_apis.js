@@ -50,9 +50,9 @@ var api = (function(){
 	* - GETs a variety of league rules/modifiers such as private, drops equipped items on death, etc.
 	*	callback : jsonp callback
 	*
-	* getLeagueRule(Number id, String callback)
+	* getLeagueRule(String id, String callback)
 	* - Gets the description for a rule for a given id (Rules have numerical id's associated with them; use getLeagueRules to find them)
-	*	id: identifier for the rule
+	*	id: identifier for the rule, e.g. Hardcore or TurboMonsters
 	*	callback: jsonp callback
 	*			
 	* Official documentation: https://www.pathofexile.com/developer/docs/api-resource-ladders
@@ -115,7 +115,6 @@ var api = (function(){
 	*
 	*/
 
-
 	/**													ACCOUNT INFORMATION																							**/
 
 	function getCharacters(accountName){ return runGETQuery(endpoints.account.characters, { 'accountName' : accountName }); }
@@ -165,9 +164,9 @@ var api = (function(){
 
 	/**													 	 MISC																									**/
 
-	function getLadder(limit, offset, leagueName, type, difficulty, accountName, includeCharacterId, start, callback){
+	function getLadder(realm,  flimit, offset, leagueName, type, difficulty, accountName, includeCharacterId, start, callback){
 		return runGETQuery(`${endpoints.api.ladders}/${leagueName}`, 
-			{'limit' : limit, 'offset' : offset, 'type' : type, 'track' : Number(includeCharacterID), 'accountName' : accountName, 'difficulty' : difficulty,
+			{'realm' : realm, 'limit' : limit, 'offset' : offset, 'type' : type, 'track' : Number(includeCharacterId), 'accountName' : accountName, 'difficulty' : difficulty,
 			 'start' : start, 'callback' : callback });
 	}
 	function getMTXSpecials(limit){
