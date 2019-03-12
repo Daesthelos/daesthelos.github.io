@@ -25,7 +25,7 @@
 <script src="javascript/data/poe_trade_search_item.js"></script>
 
 </head>
-<body>
+<body class="container">
 	<script>
 		var _data = {
 			characters : _characters,
@@ -56,148 +56,18 @@
 			},
 		};
 	</script>
-	<p>Available features:</p>
-	<ul>
-		<!-- 
-		{
-		account : {
-			characters : getCharacters,
-			character : {
-				items : getCharacterItems,
-				passives : getCharacterPassives, 
-			},
-			findByCharacter : getAccountForCharacter,
-		},
-		ladder : getLadder,
-		league : getLeague,
-		leagues : getLeagues,
-		microtransactions : { 
-			specials : getMTXSpecials,
-		},
-		pvp : {
-			matches : getPVPMatches,
-		},
-		rules : {
-			leagues : getLeagueRules,
-			league : getLeagueRule,
-		},
-		seasons: getSeasons,
-		stash_tabs : {
-			public : getPublicStashTabs,
-		},
-		trade : {
-			leagues : getTradeLeagues,
-			items : getTradeItems,
-			mods : getTradeStats,
-			static : getTradeStatic,
-			//search : searchTrade, //Requires POST functionality
-			findTradeDetails : getTrade,
-		}
-		-->
-		<li >Account Character List</li>
-		<li >Show Character Equipment</li>
-		<li >Show Character Passives</li>
-		<li >Find Account for Character</li>
-		<li >Show Ladder</li>
-		<li >Show League Info</li>
-		<li >Show All Leagues</li>
-		<li >Show Active MTX Specials</li>
-		<li >Show PVP Matches</li>
-		<li >Show League Rules</li>
-		<li >Show League Rule Description</li>
-		<li >Show Seasons</li>
-		<li >Show Public Stash Tabs</li>
-		<li >Show Current Leagues</li>
-		<li >Show Item List</li>
-		<li >Show Mod List</li>
-		<li >Show Static Item List</li>
-		<li >Show Trade Items for Trade</li>
-	</ul>
-
+	<header class="item">
+		<span>I'm a header!</span>
+	</header>
 	<main>
-		<span>I think it would be pretty neat if the left side was a full vertical list with horizontal lines sperating them. When clicked on, they turn white and the corresponding panel shows on the right side of the page</span>
-		<div class="top-div">Account Name, Character name</div>
-		<ol>
-			<li>Character row. Contains Character portrait, class, name, league, - link to equipment? - ,</li>
-		</ol>
-		<!-- Should I have passive tree functionality? -->
-		<div>
-			<label>Find account for character: <input type="text" /></label>
-		</div>
-		<div>
-			<h1>League Info</h1> <span>Filter:  Underlined search textbox with magnifying glass here. This span is on the far right side</span>
-			<ol>
-				<li>Row tab for league that expands down when clicked on to show detailed information. Row itself just shows league name?</li>
-			</ol>
-		</div>
+		
 	</main>
-
+	<footer>
+		
+	</footer>
 
 	<script src="javascript/poe_apis.js"></script>
 	<script src="javascript/poe.js"></script>
-	<script>
-		var character = {
-  "name": "TautologyIsGreat",
-  "league": "Standard",
-  "classId": 4,
-  "ascendancyClass": 1,
-  "class": "Slayer",
-  "level": 87,
-  "experience": 1560808281
-};
-
-	var global_variable;
-	function logResp([x,y,z]){ console.log(x); global_variable = x;}
-	function loadEndpoint(promisedEndpoint){
-		promisedEndpoint.then(([response, status, statusCode]) => { console.log(response); global_variable = response; });
-	}
-
-	function setDefault(input, _default){
-		return input == null ? _default : input;
-	}
-
-	class Account {
-		constructor(name){
-			this.name = name;
-			this.characters = [];
-		}
-
-		character(name){ return this.characters.find(character => character.name == name); }
-		loadCharacters(){ 
-			api.account.characters(this.name).then(([characters]) => 
-				characters.forEach(character => { 
-					this.characters.push( new Character(this.name, character))   
-				})
-			);
-		}
-	}
-
-	class Character {
-		constructor(accountName, character){
-			this.account = accountName;
-
-			this.name = character.name;
-			this.league = character.league;
-			this.classId = character.classId;
-			this.ascendancyClass = character.ascendancyClass;
-			this.class = character.class;
-			this.level = character.level;
-			this.experience = character.experience;
-
-			this.equipment = [];
-		}
-
-		findAccount(){
-			api.account.findByCharacter(this.name);
-		}
-
-		loadEquipment(){
-			api.account.character.items(this.account, this.name).then(([response]) => this.equipment = response.items );
-		}
-	}
-
-	//document.body.appendChild(templates.list(["Hello", "World"]));
-
-	</script>
+	<script></script>
 </body>
 </html>
