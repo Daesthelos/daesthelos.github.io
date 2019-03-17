@@ -6,8 +6,19 @@ html, body {
 body {
 	background-color:rgb(25,25,25);
 	color: white;
-	display:grid;
-	margin-top:1px;
+	margin-top:1px; /* I'm not sure why, but borders push past the body */
+	display: grid;
+	grid-template-columns: repeat(8, 1fr);
+	grid-template-rows: auto;
+	grid-template-areas: 
+		"logo header header header header header header header"
+		"sidebar main main main main main main main"
+		"sidebar main main main main main main main"
+		"footer footer footer footer footer footer footer footer";
+}
+
+li:focus ~ ul {
+	display:none;
 }
 
 .logo{
@@ -19,22 +30,20 @@ body {
 .sidebar{
 	grid-area: sidebar;
 }
+.sidebar .feature-list{
+
+}
 .main{
 	grid-area: main;
+
+	min-height: 480px
 }
 .footer{
 	grid-area: footer;
 }
 
 .container {
-	display: grid;
-	grid-template-columns: repeat(8, 1fr);
-	grid-template-rows: auto;
-	grid-template-areas: 
-		"logo header header header header header header header"
-		"sidebar sidebar . main main main main ."
-		"sidebar sidebar . main main main main ."
-		"footer footer footer footer footer footer footer footer";
+	display:grid;
 }
 
 .item {

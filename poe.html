@@ -1,9 +1,15 @@
 <!DOCTYPE html>
 <html>
 <head>
+<!-- Boiler plate-->
+	<title>PoE Webpage</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" >
+	<link rel="shortcut icon" href="images/poe_favicon.png" sizes="32x32">
+	<meta name="theme-color" content="#191919">
+
 	<link href="css/poe.css" rel="stylesheet" type="text/css" />
-<script src="javascript/framework.js"></script>
-<script src="javascript/poe_endpoints.js"></script>
+	<script src="javascript/framework.js"></script>
+	<script src="javascript/poe_endpoints.js"></script>
 <!-- Test DATA -->
 <script src="javascript/data/poe_characters.js"></script>
 <script src="javascript/data/poe_character_items.js"></script>
@@ -56,18 +62,38 @@
 			},
 		};
 	</script>
-	<div class="logo" style="border:1px solid white"></div>
-	<header class="header" style="border:1px solid white; height:100px">
+	<div class="logo" style="border:1px solid red; height: 64px">
+		<img src="images/poe_logo.png" style="width:100%; height:100%;object-fit: contain"></img>
+	</div>
+	<header class="header" style="border:1px solid orange; height:64px">
 	</header>
-	<div class="sidebar" style="border:1px solid white;">
-		<ul>
-			<li>&nbsp;</li>
+	<div class="sidebar" style="border:1px solid yellow;">
+		<ul class="feature-list">
+			<li>Account</li>
+			<ul>
+				<li>Characters</li>
+				<li>Character</li><!-- Load all single character info-->
+				<ul>
+					<li>Items</li>
+					<li>Passives</li>
+				</ul>
+				<li>Find by Character</li>
+			</ul>
+			<li>Ladder</li><!-- Will include info about single leagues and all leagues-->
+			<li>League</li>
+			<li>Microtransactions</li>
+			<ul>
+				<li>Specials</li>
+			</ul>
+			<li>PvP Matches</li>
+			<li>Seasons</li>
 		</ul>
 	</div>
-	<main class="main">
+	<main class="main" style="border:1px solid green">
 		&nbsp;
 	</main>
-	<footer class="footer"  style="border:1px solid white;">
+	<footer class="footer"  style="border:1px solid blue;">
+		<h3>Footer Info</h2>
 		&nbsp;
 	</footer>
 
