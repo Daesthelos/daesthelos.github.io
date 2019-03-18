@@ -69,28 +69,71 @@
 	</header>
 	<div class="sidebar" style="border:1px solid yellow;">
 		<ul class="feature-list">
-			<li>Account</li>
-			<ul>
-				<li>Characters</li>
-				<li>Character</li><!-- Load all single character info-->
-				<ul>
-					<li>Items</li>
-					<li>Passives</li>
-				</ul>
-				<li>Find by Character</li>
-			</ul>
-			<li>Ladder</li><!-- Will include info about single leagues and all leagues-->
-			<li>League</li>
-			<li>Microtransactions</li>
-			<ul>
-				<li>Specials</li>
-			</ul>
+			<li>
+				<details>
+					<summary>Account</summary>
+					<ul>
+						<li>Characters</li>
+						<li>
+							<details>
+								<summary>Character</summary><!-- Load all single character info-->
+								<ul>
+									<li>Items</li>
+									<li>Passives</li>
+								</ul>
+							</details>
+						</li>
+						<li>Find by Character</li>
+					</ul>
+				</details>
+			</li>
+			<li>Ladder</li>
+			<li>Leagues</li><!-- Will include info about single leagues and all leagues-->
+			<li>
+				<details>
+					<summary>Microtransactions</summary>
+					<ul>
+						<li>Specials</li>
+					</ul>
+				</details>
+			</li>
 			<li>PvP Matches</li>
+			<li>
+				<details>
+					<summary>Rules</summary>
+					<ul>
+						<li>Leagues</li>
+					</ul>
+				</details>
+			</li>
 			<li>Seasons</li>
+			<li>
+				<details>
+					<summary>Stash Tabs</summary>
+					<ul>
+						<li>Public</li>
+					</ul>
+				</details>
+			</li>
+			<li>
+				<details>
+					<summary>Trade</summary>
+					<ul>
+						<li>Items</li>
+						<li>Leagues</li>
+						<li>Static</li>
+						<li>Stats</li>
+					</ul>
+				</details>
+			</li>
 		</ul>
 	</div>
 	<main class="main" style="border:1px solid green">
-		&nbsp;
+		<ul style="padding:0px;margin:0px">
+			<li>
+				<div style="border:1px solid white; width:100%">Row 1</div>
+			</li>
+		</ul>
 	</main>
 	<footer class="footer"  style="border:1px solid blue;">
 		<h3>Footer Info</h2>

@@ -17,8 +17,8 @@ body {
 		"footer footer footer footer footer footer footer footer";
 }
 
-li:focus ~ ul {
-	display:none;
+ul {
+	list-style: none;
 }
 
 .logo{
@@ -31,7 +31,6 @@ li:focus ~ ul {
 	grid-area: sidebar;
 }
 .sidebar .feature-list{
-
 }
 .main{
 	grid-area: main;
