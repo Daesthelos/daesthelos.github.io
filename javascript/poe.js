@@ -45,9 +45,17 @@ function relativeDamageReduction(armor, rawDamage){ return armor/(armor+10*rawDa
 
 				return template.setContent(_template.trim());
 			}
+			function link(url){
+				var _template = `
+					<a href="${url}" download="image.png">F</a>
+				`;
+
+				return template.setContent(_template.trim());
+			}
 
 			return {
 				list : list,
+				link : link,
 			};
 
 		})();
