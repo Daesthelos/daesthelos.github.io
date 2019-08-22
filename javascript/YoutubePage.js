@@ -11,7 +11,7 @@
 						new Song("God Knows... - The Melancholy of Haruhi Suzumiya","WWB01IuMvzA"),
 						new Song("Let Me Hear - Parasyte","pxYd-Pi5xzk"),
 						new Song("Silent Solitude - OxT","rJaMKHHlHeY"),
-						new Song("Voracity - MYTH & ROID","D-LXfVLL5Tc"),
+						new Song("Voracity - MYTH & ROID","bI2-ioFv3UA"),
 						new Song("Blue Exorcist OP 2","H5wtqQPEpt8"),
 						new Song("Enigmatic Feeling - Ling Tosite Sigure","5IoHBOIWM9c"),
 						new Song("Abnormalize - Ling Tosite Sigure","J6Ja3Vip1tg"),
