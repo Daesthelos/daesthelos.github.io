@@ -19,7 +19,7 @@
 						new Song("Daze - Mekakucity Actors","jgv-IFmIn8c"),
 						new Song("Pantomime - IA","JAXukKb0fgU"),
 						new Song("Soul Eater OP 1","UAzpX8-P4WE"),
-						new Song("Silly-Go-Round - FictionJunction","GzGWvvYOqK4"),
+						new Song("Silly-Go-Round - FictionJunction (Trance Remix)","10IKm_vi3FI"),
 						new Song("Mob Psycho OP","F5OJPUXJvHk"),
 						new Song("Fallen - EGOIST", "0lSLpbAxBTA"),
 						new Song("Genesis - Stereo Dive Foundation", "hMKDN6B6fQA"),						
