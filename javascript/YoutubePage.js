@@ -7,20 +7,20 @@
 
 //Data
 	//Feels kinda dirty making this global but this needs to be referenced in various different scopes
-	var songList = [	new Song("Unravel - Tokyo Ghoul","QKXi08chD2E"),
+	var songList = [	new Song("Unravel - Tokyo Ghoul","udDOeNx9kN4"),
 						new Song("God Knows... - The Melancholy of Haruhi Suzumiya","WWB01IuMvzA"),
-						new Song("Let Me Hear - Parasyte","yWlUCpXyh9w"),
-						new Song("Silent Solitude - OxT","_4IlQEK1Vug"),
+						new Song("Let Me Hear - Parasyte","pxYd-Pi5xzk"),
+						new Song("Silent Solitude - OxT","rJaMKHHlHeY"),
 						new Song("Voracity - MYTH & ROID","D-LXfVLL5Tc"),
 						new Song("Blue Exorcist OP 2","H5wtqQPEpt8"),
-						new Song("Enigmatic Feeling - Ling Tosite Sigure","fmKPfgsclHg"),
+						new Song("Enigmatic Feeling - Ling Tosite Sigure","5IoHBOIWM9c"),
 						new Song("Abnormalize - Ling Tosite Sigure","J6Ja3Vip1tg"),
 						new Song("We Will Rock You - Monster Strike","l8YXfBP3VFM"),
 						new Song("Daze - Mekakucity Actors","jgv-IFmIn8c"),
 						new Song("Pantomime - IA","JAXukKb0fgU"),
 						new Song("Soul Eater OP 1","UAzpX8-P4WE"),
 						new Song("Silly-Go-Round - FictionJunction","GzGWvvYOqK4"),
-						new Song("Mob Psycho OP","l5rPZJiYFfg"),
+						new Song("Mob Psycho OP","F5OJPUXJvHk"),
 						new Song("Fallen - EGOIST", "0lSLpbAxBTA"),
 						new Song("Genesis - Stereo Dive Foundation", "hMKDN6B6fQA"),						
 	];
