@@ -23,6 +23,7 @@
   },
   "homepage": "https://github.com/Daesthelos/daesthelos.github.io#readme",
   "dependencies": {
+    "axios": "^0.20.0",
     "nuxt": "^2.14.6"
   }
 }

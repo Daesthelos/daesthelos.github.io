@@ -1,0 +1,23 @@
+[
+  {
+    "name": "user",
+    "path": "/user",
+    "component": "C:\\\\Users\\\\Scott\\\\Development\\\\learn\\\\vue-portfolio\\\\pages\\\\user\\\\index.vue",
+    "chunkName": "pages/user/index",
+    "_name": "_670fceef"
+  },
+  {
+    "name": "user-id",
+    "path": "/user/:id",
+    "component": "C:\\\\Users\\\\Scott\\\\Development\\\\learn\\\\vue-portfolio\\\\pages\\\\user\\\\_id.vue",
+    "chunkName": "pages/user/_id",
+    "_name": "_20d2c117"
+  },
+  {
+    "name": "index",
+    "path": "/",
+    "component": "C:\\\\Users\\\\Scott\\\\Development\\\\learn\\\\vue-portfolio\\\\pages\\\\index.vue",
+    "chunkName": "pages/index",
+    "_name": "_7392d71a"
+  }
+]
